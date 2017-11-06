@@ -1,6 +1,6 @@
 ---
 title: "STAT/MATH 495: Problem Set 09"
-author: "WRITE YOUR NAME(S) HERE"
+author: "Leonard Yoon"
 date: "2017-11-07"
 output:
   html_document:
@@ -36,7 +36,7 @@ observations_1 <- read_csv("data/observations_1.csv")
 observations_2 <- read_csv("data/observations_2.csv")
 
 # Set observations to be one of two datasets
-observations <- observations_2
+observations <- observations_1
 
 # Fit model for k=2
 k <- 2
@@ -64,17 +64,17 @@ ggplot(NULL, aes(x=x1, y=x2, col=cluster)) +
 results.
 1. Speculate on the root cause of any consistency or inconsistency in the
 results.
-1. Run KMC 10 times on `observations_2` and comment on the consistentcy of the
+1. Run KMC 10 times on `observations_2` and comment on the consistency of the
 results.
 1. Speculate on the root cause of any consistency or inconsistency in the
 results.
 
 **Answers**:
 
-1.
-1.
-1.
-1.
+1. The reults are rather inconsistent in that there are 4 possible outcomes: cluster 1 is approximately the top half of points, and cluster 2 is the bottom half of points; cluster 1 is approximately the left half of points, and cluster 2 is the right half of points; and vice versa to both scenarios. However, all of the points that are in the left/right cluster are always in the left/right cluster in every iteration (no flip-flop of points in the middle), and same for the top/bottom clusters.
+1. The inconsistency comes from the fact that the initialization step in `kmeans` entails random assignment of cluster to all points, and the centers of these random points might be farther away vertically or horizaontally. If the initial centers are closer vertically but farther away horizontally, it becomes more likely that after optimization, cluster 1 will be the left or right half of points and cluster 2 will be the other half. If the initial centers are closer horizontally but father away vertically, it becomes more likely that after optimization, cluster 1 will be the top or bottom half of points and cluster 2 will be the other half.
+1. The results are consistent in that all of the points in a given cluster are always in the cluster together, though the designation of cluster 1 and cluster 2 seems to be random. That is, the points in the top right quadrant are always cluster 1 or cluster 2 and the points in the bottom left quadrant are the other cluster (I'm defining the "quadrant" as left or right of x1 = 1.0 and above or below x2 = 1.0).
+1. The inconsistency comes from the fact that the initialization step entails random assignments of clusters to all points, and the centers of these random points might be closer to one quadrant or another. For example, the center of cluster 1 might happen to initialize closer to the top right quadrant for one iteration of `kmeans` and after optimization, the center of cluster 1 becomes the center of the points in that upper right quadrant. But one can easily imagine a similar scenario where the center of cluster 1 happens to initialize closer to the bottom left quadrant in another iteration of `kmeans`.
 
 
 
@@ -84,7 +84,7 @@ Read ISLR page 388 Algorithm 10.1 and implement k-means clustering from scratch.
 Don't worry about doing it for general $k$; keep it simple and do it for $k=2$
 specifically. Apply it to `observations_2` from above.
 
-```{r}
+```{r,eval=FALSE,include=FALSE}
 # Hint:
 library(proxy)
 A <- data_frame(
