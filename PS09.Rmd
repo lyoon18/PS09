@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 set.seed(76)
 
 library(tidyverse)
+library(proxy)
 ```
 
 
@@ -84,9 +85,8 @@ Read ISLR page 388 Algorithm 10.1 and implement k-means clustering from scratch.
 Don't worry about doing it for general $k$; keep it simple and do it for $k=2$
 specifically. Apply it to `observations_2` from above.
 
-```{r,eval=FALSE,include=FALSE}
+```{r}
 # Hint:
-library(proxy)
 A <- data_frame(
   x1 = c(0, 0.5, 0.75, 1),
   x2 = c(0, 0.5, 0.75, 1)
@@ -97,5 +97,32 @@ B <- data_frame(
 )
 distance_matrix <- proxy::dist(x=A, y=B)
 distance_matrix
-apply(distance_matrix, 1, which.min)
+apply(distance_matrix, 1, which.min) # chooses the column within each row containing the min
+apply(distance_matrix, 2, which.min) # chooses the row within each column containing the min
+```
+
+In the distance matrix above, the number in [1,1] corresponds to the distance of (0,0) from (1,1) (which is $\sqrt{2}$). The number in [1,2] corresponds to the distance of (0,0) from (0,0) (which is 0).
+
+```{r, eval=FALSE, include=FALSE}
+observations_2 <- observations_2 %>% 
+  mutate(ID = rownames(observations_2)) %>% # create ID
+  select(ID, x1, x2) # reorder columns, ID first
+A <- observations_2 %>% # randomly choose points in first cluster
+  sample_n(50)
+B <- observations_2 %>% 
+  anti_join(A, by="ID")
+center <- data_frame( # 2 random centers with coordinates (x1, y1) and (x2, y2)
+  x1 = c(runif(1, min = range(observations_2$x1)[1], max = range(observations_2$x1)[2]), # x1
+         runif(1, min = range(observations_2$x2)[1], max = range(observations_2$x2)[2])), # x2
+  x2 = c(runif(1, min = range(observations_2$x1)[1], max = range(observations_2$x1)[2]), # y1
+         runif(1, min = range(observations_2$x2)[1], max = range(observations_2$x2)[2])) # y2
+)
+distance_matrix_A <- proxy::dist(x=A[-1], y=center) # ignores ID for purposes of calculating distance
+distance_matrix_A
+distance_matrix_B <- proxy::dist(x=B[-1], y=center)
+distance_matrix_B
+A <- A %>% mutate(cluster = apply(distance_matrix_A, 1, which.min))
+apply(distance_matrix_B, 1, which.min)
+
+# I'm stuck trying to reassign points from 1 or 2 into a new A and new B
 ```
